@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "custom_edges",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "u": 170424926, "v": 485629098, "key": 0, "osmid": "custom_bridge", "highway": "custom", "lanes": null, "maxspeed": null, "oneway": false, "ref": null, "reversed": null, "length": 936.71970708209142, "grade": null, "grade_abs": null, "bridge": null, "name": "custom_bridge", "tunnel": null, "width": null, "junction": null, "access": null, "custom_edge": "True", "est_width": null }, "geometry": { "type": "LineString", "coordinates": [ [ 8.5354168, 47.360332 ], [ 8.5478114, 47.3600888 ] ] } },
+{ "type": "Feature", "properties": { "u": 474380747, "v": 1625793445, "key": 0, "osmid": "custom_bridge", "highway": "custom", "lanes": null, "maxspeed": null, "oneway": false, "ref": null, "reversed": null, "length": 1411.6405539904135, "grade": -0.085387831859036978, "grade_abs": 0.085387831859036978, "bridge": null, "name": "custom_bridge", "tunnel": null, "width": null, "junction": null, "access": null, "custom_edge": "True", "est_width": null }, "geometry": { "type": "LineString", "coordinates": [ [ 8.4686489, 47.3643631 ], [ 8.4866131, 47.3678639 ] ] } },
+{ "type": "Feature", "properties": { "u": 485629098, "v": 170424926, "key": 0, "osmid": "custom_bridge", "highway": "custom", "lanes": null, "maxspeed": null, "oneway": false, "ref": null, "reversed": null, "length": 936.71970708209142, "grade": null, "grade_abs": null, "bridge": null, "name": "custom_bridge", "tunnel": null, "width": null, "junction": null, "access": null, "custom_edge": "True", "est_width": null }, "geometry": { "type": "LineString", "coordinates": [ [ 8.5478114, 47.3600888 ], [ 8.5354168, 47.360332 ] ] } },
+{ "type": "Feature", "properties": { "u": 1625793445, "v": 474380747, "key": 0, "osmid": "custom_bridge", "highway": "custom", "lanes": null, "maxspeed": null, "oneway": false, "ref": null, "reversed": null, "length": 1411.6405539904135, "grade": 0.085387831859036978, "grade_abs": 0.085387831859036978, "bridge": null, "name": "custom_bridge", "tunnel": null, "width": null, "junction": null, "access": null, "custom_edge": "True", "est_width": null }, "geometry": { "type": "LineString", "coordinates": [ [ 8.4866131, 47.3678639 ], [ 8.4686489, 47.3643631 ] ] } }
+]
+}

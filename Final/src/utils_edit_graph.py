@@ -21,6 +21,7 @@ zweiter/projizierter Graph angelegt.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any, Optional
 
 import geopandas as gpd
@@ -33,10 +34,14 @@ from ipyleaflet import GeoJSON, Map, Marker, Polyline, basemaps
 # Modulzustand für den Jupyter-Click-Handler
 m: Optional[Map] = None
 G = None
+_edge_layer: Optional[GeoJSON] = None
+_node_layer: Optional[GeoJSON] = None
+_edit_mode = "add"
 
 _clicked_points: list[tuple[float, float]] = []
 _clicked_markers: list[Marker] = []
 _clicked_lines: list[Polyline] = []
+_deleted_lines: list[Polyline] = []
 _created_edges: list[tuple[Any, Any, Any]] = []
 _geod = Geod(ellps="WGS84")
 
@@ -107,6 +112,20 @@ def _graph_to_layers(graph):
     return node_layer, edge_layer
 
 
+def _refresh_graph_layers() -> None:
+    """Aktualisiert die sichtbaren Node-/Edge-Layer nach Graph-Änderungen."""
+    if G is None:
+        return
+
+    nodes, edges = ox.graph_to_gdfs(G)
+
+    if _edge_layer is not None:
+        _edge_layer.data = json.loads(edges.to_json())
+
+    if _node_layer is not None:
+        _node_layer.data = json.loads(nodes.to_json())
+
+
 def _edge_length_m(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
     """Berechnet die geodätische Länge in Metern zwischen zwei Lon/Lat-Punkten."""
     _, _, distance = _geod.inv(lon1, lat1, lon2, lat2)
@@ -132,6 +151,12 @@ def reset_edit_state(remove_edges: bool = True) -> None:
             except Exception:
                 pass
 
+        for line in list(_deleted_lines):
+            try:
+                m.remove_layer(line)
+            except Exception:
+                pass
+
     if remove_edges:
         for graph, u, v, key in reversed(_created_edges):
             _remove_edge(graph, u, v, key)
@@ -139,7 +164,9 @@ def reset_edit_state(remove_edges: bool = True) -> None:
     _clicked_points.clear()
     _clicked_markers.clear()
     _clicked_lines.clear()
+    _deleted_lines.clear()
     _created_edges.clear()
+    _refresh_graph_layers()
 
 
 def init_map(
@@ -169,7 +196,7 @@ def init_map(
         Wenn True, wird eine Kopie des Graphen bearbeitet. Standardmässig wird
         der übergebene Graph direkt bearbeitet, damit `G` im Notebook aktualisiert ist.
     """
-    global m, G
+    global m, G, _edge_layer, _node_layer
 
     reset_edit_state(remove_edges=False)
 
@@ -193,9 +220,9 @@ def init_map(
         basemap=basemaps.OpenStreetMap.Mapnik,
     )
 
-    node_layer, edge_layer = _graph_to_layers(G)
-    m.add_layer(edge_layer)
-    m.add_layer(node_layer)
+    _node_layer, _edge_layer = _graph_to_layers(G)
+    m.add_layer(_edge_layer)
+    m.add_layer(_node_layer)
 
     if show_bbox and bbox_or_polygon is not None:
         try:
@@ -213,6 +240,19 @@ def init_map(
             pass
 
     return m
+
+
+def set_edit_mode(mode: str) -> None:
+    """
+    Setzt den Kartenmodus: "add" für Edge hinzufügen, "delete" für Edge löschen.
+    """
+    global _edit_mode
+
+    if mode not in {"add", "delete"}:
+        raise ValueError('mode muss "add" oder "delete" sein.')
+
+    _edit_mode = mode
+    _clicked_points.clear()
 
 
 def create_bridge(click1: tuple[float, float], click2: tuple[float, float]) -> dict:
@@ -266,6 +306,7 @@ def create_bridge(click1: tuple[float, float], click2: tuple[float, float]) -> d
     )
     _clicked_lines.append(bridge_line)
     m.add_layer(bridge_line)
+    _refresh_graph_layers()
 
     return {
         "node1": node1,
@@ -273,6 +314,67 @@ def create_bridge(click1: tuple[float, float], click2: tuple[float, float]) -> d
         "length": length,
         "geometry": line,
     }
+
+
+def delete_nearest_edge(click: tuple[float, float], *, remove_reverse: bool = True) -> dict:
+    """
+    Löscht die Edge, die dem Kartenklick am nächsten liegt.
+
+    click ist eine Leaflet-Koordinate als (lat, lon). Bei bidirektionalen
+    Strassen wird standardmässig auch die Gegenrichtung entfernt.
+    """
+    if m is None or G is None:
+        raise RuntimeError("Bitte zuerst init_map(..., G) ausführen.")
+
+    lat, lon = click
+    nearest = ox.distance.nearest_edges(G, X=lon, Y=lat)
+
+    if len(nearest) == 3:
+        u, v, key = nearest
+    else:
+        u, v = nearest
+        key = None
+
+    data = G.get_edge_data(u, v, key) if key is not None and G.is_multigraph() else G.get_edge_data(u, v)
+    if G.is_multigraph() and isinstance(data, dict) and key is None:
+        key, data = next(iter(data.items()))
+
+    geometry = None
+    if isinstance(data, dict):
+        geometry = data.get("geometry")
+
+    if geometry is None:
+        geometry = LineString([
+            (float(G.nodes[u]["x"]), float(G.nodes[u]["y"])),
+            (float(G.nodes[v]["x"]), float(G.nodes[v]["y"])),
+        ])
+
+    _remove_edge(G, u, v, key)
+
+    removed = [(u, v, key)]
+    if remove_reverse and G.has_edge(v, u):
+        reverse_data = G.get_edge_data(v, u)
+        if G.is_multigraph() and isinstance(reverse_data, dict):
+            for reverse_key in list(reverse_data.keys()):
+                _remove_edge(G, v, u, reverse_key)
+                removed.append((v, u, reverse_key))
+        else:
+            _remove_edge(G, v, u)
+            removed.append((v, u, None))
+
+    line = Polyline(
+        locations=[(lat_, lon_) for lon_, lat_ in geometry.coords],
+        color="orange",
+        weight=6,
+        opacity=0.8,
+        dash_array="6",
+        name="Geloeschte Edge",
+    )
+    _deleted_lines.append(line)
+    m.add_layer(line)
+    _refresh_graph_layers()
+
+    return {"removed_edges": removed, "geometry": geometry}
 
 
 def handle_click(**kwargs) -> None:
@@ -286,6 +388,12 @@ def handle_click(**kwargs) -> None:
     if m is None:
         raise RuntimeError("Bitte zuerst init_map(..., G) ausführen.")
 
+    lat, lon = kwargs.get("coordinates")
+
+    if _edit_mode == "delete":
+        delete_nearest_edge((lat, lon))
+        return
+
     # Nach je zwei Klicks sind die Punkte zurückgesetzt; alte Marker entfernen.
     if len(_clicked_points) == 0:
         for marker in list(_clicked_markers):
@@ -295,7 +403,6 @@ def handle_click(**kwargs) -> None:
                 pass
         _clicked_markers.clear()
 
-    lat, lon = kwargs.get("coordinates")
     _clicked_points.append((lat, lon))
 
     marker = Marker(location=(lat, lon))
@@ -329,6 +436,36 @@ def get_custom_edges():
     return edges[edges["custom_edge"].fillna(False)].copy()
 
 
+def save_edited_graph(
+    graph_path: str | Path = "output/G_edit.graphml",
+    custom_edges_path: str | Path | None = "output/custom_edges.geojson",
+):
+    """
+    Speichert den bearbeiteten Graphen und optional die manuell erzeugten Edges.
+    """
+    graph = get_edited_graph()
+    graph_path = Path(graph_path)
+    graph_path.parent.mkdir(parents=True, exist_ok=True)
+    ox.save_graphml(graph, filepath=graph_path)
+
+    saved = {"graph": graph_path}
+
+    if custom_edges_path is not None:
+        custom_edges = get_custom_edges()
+        custom_edges_path = Path(custom_edges_path)
+        custom_edges_path.parent.mkdir(parents=True, exist_ok=True)
+        if custom_edges.empty:
+            custom_edges_path.write_text(
+                json.dumps({"type": "FeatureCollection", "features": []}),
+                encoding="utf-8",
+            )
+        else:
+            custom_edges.to_file(custom_edges_path, driver="GeoJSON")
+        saved["custom_edges"] = custom_edges_path
+
+    return saved
+
+
 def undo_last_bridge() -> None:
     """
     Entfernt die zuletzt erzeugte Brücke, also beide Richtungen im Graphen.
@@ -346,6 +483,8 @@ def undo_last_bridge() -> None:
             m.remove_layer(line)
         except Exception:
             pass
+
+    _refresh_graph_layers()
 
 
 def clear_custom_edges() -> None:
