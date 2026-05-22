@@ -25,6 +25,9 @@ config = {
                             "strokeOpacity": 0.8,
                             "thickness": 0.5,
                             "strokeColor": [179, 173, 158],
+
+                            "sizeRange": [0.01, 2],
+
                             "strokeColorRange": {
                                 "colors": [
                                     "#184E77",
@@ -49,7 +52,17 @@ config = {
                             "name": "len",
                             "type": "real"
                         },
-                        "strokeColorScale": "quantile"
+                        "strokeColorScale": "quantile",
+                        "sizeField": {
+                            "name": "len",
+                            "type": "real"
+                        },
+                        "sizeScale": "log",
+                        "heightField": None,
+                        "heightScale": "linear",
+                        "radiusField": None,
+                        "radiusScale": "linear",
+                        "colorField": None,
                     }
                 },
                 {
@@ -58,15 +71,17 @@ config = {
                     "config": {
                         "dataId": "Stadt Perimeter",
                         "label": "Stadt Perimeter",
+                            "color": [22, 42, 101],
+                            "highlightColor": [252, 242, 26, 255],
                         "columns": {
                             "geojson": "_geojson"
                         },
                         "isVisible": True,
                         "visConfig": {
                             "opacity": 0.05,
-                            "strokeOpacity": 0.35,
-                            "thickness": 0.35,
-                            "color": [22, 42, 101],
+                            "strokeOpacity": 0.4,
+                            "thickness": 0.8,
+                            "color": [0, 0, 101],
                             "strokeColor": [221, 178, 124],
                             "stroked": True,
                             "filled": True,
@@ -74,7 +89,18 @@ config = {
                             "allowHover": True
                         }
                     },
-                    "visualChannels": {}
+                    "visualChannels": {
+                        "colorField": None,
+                        "colorScale": "quantile",
+                        "strokeColorField": None,
+                        "strokeColorScale": "quantile",
+                        "sizeField": None,
+                        "sizeScale": "linear",
+                        "heightField": None,
+                        "heightScale": "linear",
+                        "radiusField": None,
+                        "radiusScale": "linear"
+                    }
                 }
             ],
             "interactionConfig": {
@@ -503,7 +529,9 @@ config = {
 #                         "label": "City_Polygon",
 #                         "color": [22, 42, 101],
 #                         "highlightColor": [252, 242, 26, 255],
-#                         "columns": {"geojson": "_geojson"},
+#                         "columns": {
+#                             "geojson": "_geojson"
+#                         },
 #                         "isVisible": True,
 #                         "visConfig": {
 #                             "opacity": 0.13,
@@ -587,7 +615,9 @@ config = {
 #                         "label": "trajectories_lines_s_4326",
 #                         "color": [137, 218, 193],
 #                         "highlightColor": [252, 242, 26, 255],
-#                         "columns": {"geojson": "_geojson"},
+#                         "columns": {
+#                             "geojson": "_geojson"
+#                         },
 #                         "isVisible": True,
 #                         "visConfig": {
 #                             "opacity": 0.8,
@@ -621,7 +651,7 @@ config = {
 #                                 "category": "Uber"
 #                             },
 #                             "radius": 10,
-#                             "sizeRange": [0, 10],
+#                             "sizeRange": [0, 2],
 #                             "radiusRange": [0, 50],
 #                             "heightRange": [0, 500],
 #                             "elevationScale": 5,
@@ -657,7 +687,10 @@ config = {
 #                             "type": "real"
 #                         },
 #                         "strokeColorScale": "quantile",
-#                         "sizeField": None,
+#                         "sizeField": {
+#                             "name": "len",
+#                             "type": "real"
+#                         },
 #                         "sizeScale": "linear",
 #                         "heightField": None,
 #                         "heightScale": "linear",
@@ -684,9 +717,17 @@ config = {
 #                     "compareType": "absolute",
 #                     "enabled": True
 #                 },
-#                 "brush": {"size": 0.5, "enabled": False},
-#                 "geocoder": {"limitSearch": False, "enabled": False},
-#                 "coordinate": {"enabled": False}
+#                 "brush": {
+#                     "size": 0.5,
+#                     "enabled": False
+#                 },
+#                 "geocoder": {
+#                     "limitSearch": False,
+#                     "enabled": False
+#                 },
+#                 "coordinate": {
+#                     "enabled": False
+#                 }
 #             },
 #             "layerBlending": "normal",
 #             "overlayBlending": "normal",
@@ -703,10 +744,10 @@ config = {
 #         "mapState": {
 #             "bearing": 0,
 #             "dragRotate": False,
-#             "latitude": 47.35961188196926,
-#             "longitude": 8.4911356884721,
+#             "latitude": 47.39938949882818,
+#             "longitude": 8.529940638749368,
 #             "pitch": 0,
-#             "zoom": 10.63635097324908,
+#             "zoom": 16.22426687366379,
 #             "isSplit": False,
 #             "isViewportSynced": True,
 #             "isZoomLocked": False,
@@ -735,7 +776,9 @@ config = {
 #         },
 #         "uiState": {
 #             "mapControls": {
-#                 "mapLegend": {"active": False}
+#                 "mapLegend": {
+#                     "active": False
+#                 }
 #             },
 #             "locale": "en"
 #         }
