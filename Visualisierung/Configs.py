@@ -10,33 +10,23 @@ config = {
         },
         "visState": {
             "layers": [
+#Routen Layer
                 {
                     "id": "routen_layer",
                     "type": "geojson",
                     "config": {
                         "dataId": "Trajectories",
                         "label": "Routen",
-                        "columns": {
-                            "geojson": "_geojson"
-                        },
+                        "columns": {"geojson": "_geojson"},
                         "isVisible": True,
                         "visConfig": {
-                            "opacity": 0.8,
+                            "opacity": 0.7,
                             "strokeOpacity": 0.8,
                             "thickness": 0.5,
                             "strokeColor": [179, 173, 158],
-
-                            "sizeRange": [0.01, 2],
-
+                            "sizeRange": [0, 2],
                             "strokeColorRange": {
-                                "colors": [
-                                    "#184E77",
-                                    "#146E96",
-                                    "#0090AF",
-                                    "#36B5A5",
-                                    "#90D392",
-                                    "#D9ED92"
-                                ],
+                                "colors": ["#184E77", "#146E96", "#0090AF", "#36B5A5", "#90D392", "#D9ED92"],
                                 "name": "SummerSky",
                                 "type": "sequential",
                                 "category": "Uber"
@@ -48,43 +38,69 @@ config = {
                         }
                     },
                     "visualChannels": {
-                        "strokeColorField": {
-                            "name": "len",
-                            "type": "real"
-                        },
+                        "strokeColorField": {"name": "length", "type": "real"},
                         "strokeColorScale": "quantile",
-                        "sizeField": {
-                            "name": "len",
-                            "type": "real"
-                        },
+                        "sizeField": {"name": "length", "type": "real"},
                         "sizeScale": "log",
                         "heightField": None,
                         "heightScale": "linear",
                         "radiusField": None,
                         "radiusScale": "linear",
-                        "colorField": None,
+                        "colorField": None
                     }
                 },
+#Stadt Perimeter Layer
                 {
                     "id": "stadt_perimeter_layer",
                     "type": "geojson",
                     "config": {
                         "dataId": "Stadt Perimeter",
                         "label": "Stadt Perimeter",
-                            "color": [22, 42, 101],
-                            "highlightColor": [252, 242, 26, 255],
-                        "columns": {
-                            "geojson": "_geojson"
-                        },
+                        "columns": {"geojson": "_geojson"},
                         "isVisible": True,
                         "visConfig": {
-                            "opacity": 0.05,
-                            "strokeOpacity": 0.4,
-                            "thickness": 0.8,
-                            "color": [0, 0, 101],
-                            "strokeColor": [221, 178, 124],
+                            "opacity": 0.35,
+                            "strokeOpacity": 1,
+                            "thickness": 1.5,
+
+                            "color": [55, 95, 220],
+                            "strokeColor": [35, 60, 170],
+
                             "stroked": True,
                             "filled": True,
+                            "enable3d": False,
+                            "allowHover": True
+                        }
+                    },
+                    "visualChannels": {
+                        "colorField": None,
+                        "colorScale": "quantile",
+                        "strokeColorField": None,
+                        "strokeColorScale": "quantile",
+                        "sizeField": None,
+                        "sizeScale": "linear",
+                        "heightField": None,
+                        "heightScale": "linear",
+                        "radiusField": None,
+                        "radiusScale": "linear"
+                    }
+                },
+#Bridges and Tunnels Layer
+                {
+                    "id": "bridges_layer",
+                    "type": "geojson",
+                    "config": {
+                        "dataId": "Bridges",
+                        "label": "Bridges",
+                        "columns": {"geojson": "_geojson"},
+                        "isVisible": True,
+                        "visConfig": {
+                            "opacity": 1,
+                            "strokeOpacity": 1,
+                            "thickness": 1,
+                            "strokeColor": [240, 147, 107],
+                            "stroked": True,
+                            "filled": False,
                             "enable3d": False,
                             "allowHover": True
                         }
@@ -107,11 +123,16 @@ config = {
                 "tooltip": {
                     "fieldsToShow": {
                         "Trajectories": [
-                            {"name": "traj_idx", "format": None},
-                            {"name": "start_x", "format": None},
-                            {"name": "start_y", "format": None},
-                            {"name": "end_x", "format": None},
-                            {"name": "end_y", "format": None}
+                            {"name": "osmid", "format": None},
+                            {"name": "highway", "format": None},
+                            {"name": "maxspeed", "format": None},
+                            {"name": "length", "format": None}
+                        ],
+                        "Bridges and Tunnels": [
+                            {"name": "osmid", "format": None},
+                            {"name": "bridge", "format": None},
+                            {"name": "tunnel", "format": None},
+                            {"name": "highway", "format": None}
                         ]
                     },
                     "enabled": True
