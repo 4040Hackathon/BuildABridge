@@ -53,7 +53,7 @@ config = {
                 "visConfig": {
                     "opacity": 0.8,
                     "strokeOpacity": 0.8,
-                    "thickness": 1.1,
+                    "thickness": 1.4,
 
                     "strokeColorRange": {
                         "colors": [
@@ -112,38 +112,43 @@ config = {
 
                 "isVisible": True,
 
-                "color": [179, 173, 158],
-                "highlightColor": [255, 210, 120, 255],
+                "color": [242, 241, 220],
+                "highlightColor": [252, 242, 26, 255],
 
                 "visConfig": {
                     "opacity": 0.8,
                     "strokeOpacity": 0.8,
+                    "thickness": 0.5,
 
-                    # Basisdicke
-                    "thickness": 1,
+                    "strokeColor": [242, 241, 220],
 
-                    "strokeColor": [179, 173, 158],
-
-                    # Linienbreite Bereich
-                    "sizeRange": [0.2, 3.2],
-
-                    "strokeColorRange": {
-                        "colors": [
-                            "#F2F2F2",
-                            "#D9D9D9",
-                            "#A6A6A6",
-                            "#595959"
-                        ],
-                        "name": "Greyscale Traffic",
-                        "type": "custom",
-                        "category": "Custom"
-                    },
+                    "sizeRange": [1, 6],
 
                     "stroked": True,
                     "filled": False,
                     "enable3d": False,
+                    "wireframe": False,
+                    "fixedHeight": False,
                     "allowHover": True
-                }
+                },
+
+                "hidden": False,
+
+                "textLabel": [
+                    {
+                        "field": None,
+                        "color": [255, 255, 255],
+                        "size": 18,
+                        "weight": 400,
+                        "offset": [0, 0],
+                        "anchor": "start",
+                        "alignment": "center",
+                        "outlineWidth": 0,
+                        "outlineColor": [255, 0, 0, 255],
+                        "background": False,
+                        "backgroundColor": [0, 0, 200, 255]
+                    }
+                ]
             },
 
             "visualChannels": {
@@ -151,19 +156,15 @@ config = {
                 "colorField": None,
                 "colorScale": "quantile",
 
-                # Farbe nach Auslastung
-                "strokeColorField": {
-                    "name": "heat_m",
-                    "type": "integer"
-                },
+                "strokeColorField": None,
                 "strokeColorScale": "quantile",
 
-                # Dicke nach Auslastung
                 "sizeField": {
                     "name": "heat_m",
                     "type": "integer"
                 },
-                "sizeScale": "sqrt",
+
+                "sizeScale": "linear",
 
                 "heightField": None,
                 "heightScale": "linear",
@@ -267,7 +268,7 @@ config = {
                         "visConfig": {
                             "opacity": 1,
                             "strokeOpacity": 1,
-                            "thickness": 1.5,
+                            "thickness": 1.35,
 
                             "strokeColor": [150, 152, 176],
 
@@ -322,7 +323,7 @@ config = {
                         "visConfig": {
                             "opacity": 1,
                             "strokeOpacity": 1,
-                            "thickness": 1.5,
+                            "thickness": 1.35,
 
                             "strokeColor": [140, 120, 100],
 
